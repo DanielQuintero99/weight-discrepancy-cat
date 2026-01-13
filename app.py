@@ -1,5 +1,5 @@
 import streamlit as st
-from logic import run_analysis
+from logic.py import run_analysis
 
 st.set_page_config(page_title="Weight Discrepancy Checker")
 
