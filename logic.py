@@ -476,20 +476,6 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
 
     return summary, df_full, df_adj, validation_df
 
-# Ejecutar análisis (1 GR + 1 o más Invoices)
-
-print("\n📦 Tabla completa (CAT):")
-display(df_full)
-
-print(f"🔹 Suma NEW WEIGHT lbs: {round(df_full['NEW WEIGHT lbs'].sum(), 2)} lbs")
-print(f"🔹 Suma NEW WEIGHT kgs: {round(df_full['NEW WEIGHT kgs'].sum(), 2)} kg")
-
-print("\n📦 Solo piezas ajustadas (CAT):")
-display(df_adjusted)
-
-if validation_df is not None:
-    print("\n📊 VALIDACIÓN – Invoice vs GR vs Nuevo")
-    display(validation_df)
 
 def run_analysis(uploaded, tol=TOL_DEFAULT):
     ...
