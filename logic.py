@@ -419,13 +419,12 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
     gr_lines = None
     gr_file = None
 
+    # 1️⃣ Identificar GR e invoices
     for fname, fbytes in uploaded.items():
         lines = pdf_bytes_to_lines(fbytes)
         if is_gr(lines) and gr_lines is None:
             gr_lines = lines
             gr_file = fname
-        elif is_invoice(lines):
-            invoices.append((fname, lines))
         else:
             invoices.append((fname, lines))
 
@@ -434,22 +433,53 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
     if not invoices:
         raise ValueError("No encontré ninguna invoice con PACKING LIST.")
 
+    # 2️⃣ Parsear GR
     gr_total, gr_pieces = parse_gr(gr_lines)
 
+    # 3️⃣ Parsear invoices → inv_df
     inv_dfs = [parse_invoice_packing_list(lines, name) for name, lines in invoices]
     inv_df = pd.concat(inv_dfs, ignore_index=True)
 
     if DEDUP_CASES_ACROSS_INVOICES:
         inv_df = collapse_duplicates_across_invoices(inv_df)
 
+    # 4️⃣ Totales y tolerancias
     inv_total = float(inv_df["CAT_WEIGHT_KG"].sum())
     low, high = invoice_band_from_gr(gr_total, tol)
-
     in_before = (low <= inv_total <= high)
 
+    # 5️⃣ Matching GR ↔ invoice
     gr_map, inv_n, gr_n = match_gr_to_invoice_by_similarity(inv_df, gr_pieces)
 
+    # 6️⃣ Ajustes
     updates = {}
     if not in_before:
         updates = gr_guided_adjust_auto(inv_df, gr_map, low, high)
-        
+
+    # 7️⃣ Tablas CAT
+    df_full, df_adj = build_cat_tables(inv_df, updates)
+
+    new_total = float(df_full["NEW WEIGHT kgs"].sum())
+    in_after = (low <= new_total <= high)
+
+    # 8️⃣ Summary
+    summary = pd.DataFrame([{
+        "GR file": gr_file,
+        "Invoices files": ", ".join([x[0] for x in invoices]),
+        "Invoice total (kg)": round(inv_total, 2),
+        "GR total (kg)": round(gr_total, 2),
+        "Allowed low (kg)": round(low, 2),
+        "Allowed high (kg)": round(high, 2),
+        "Pieces detected": int(len(inv_df)),
+        "GR pieces extracted": int(gr_n),
+        "Pieces changed": int(len(df_adj)),
+        "New total (kg)": round(new_total, 2),
+        "In tolerance BEFORE": bool(in_before),
+        "In tolerance AFTER": bool(in_after),
+    }])
+
+    # 9️⃣ Validación
+    validation_df = build_validation(inv_df, gr_map, updates)
+
+    # ✅ UN SOLO RETURN
+    return summary, df_full, df_adj, validation_df
