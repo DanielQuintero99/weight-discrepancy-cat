@@ -453,32 +453,3 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
     if not in_before:
         updates = gr_guided_adjust_auto(inv_df, gr_map, low, high)
         
-def run_analysis(uploaded, tol=TOL_DEFAULT):
-    ...
-    # construir tablas CAT
-    df_full, df_adj = build_cat_tables(inv_df, updates)
-
-    new_total = float(df_full["NEW WEIGHT kgs"].sum())
-    in_after = (low <= new_total <= high)
-
-    summary = pd.DataFrame([{
-        "GR file": gr_file,
-        "Invoices files": ", ".join([x[0] for x in invoices]),
-        "Invoice total (kg)": round(inv_total, 2),
-        "GR total (kg)": round(gr_total, 2),
-        "Allowed low (kg)": round(low, 2),
-        "Allowed high (kg)": round(high, 2),
-        "Pieces detected": int(len(inv_df)),
-        "GR pieces extracted": int(gr_n),
-        "Pieces changed": int(len(df_adj)),
-        "New total (kg)": round(new_total, 2),
-        "In tolerance BEFORE": bool(in_before),
-        "In tolerance AFTER": bool(in_after),
-    }])
-
-    validation_df = build_validation(inv_df, gr_map, updates)
-
-    # UN SOLO RETURN, AL FINAL
-    return summary, df_full, df_adj, validation_df
-
-
