@@ -452,7 +452,10 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
     updates = {}
     if not in_before:
         updates = gr_guided_adjust_auto(inv_df, gr_map, low, high)
-
+        
+def run_analysis(uploaded, tol=TOL_DEFAULT):
+    ...
+    return summary, df_full, df_adj, validation_df
     df_full, df_adj = build_cat_tables(inv_df, updates)
     new_total = float(df_full["NEW WEIGHT kgs"].sum())
     in_after = (low <= new_total <= high)
@@ -477,6 +480,4 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
     return summary, df_full, df_adj, validation_df
 
 
-def run_analysis(uploaded, tol=TOL_DEFAULT):
-    ...
-    return summary, df_full, df_adj, validation_df
+
