@@ -455,8 +455,9 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
         
 def run_analysis(uploaded, tol=TOL_DEFAULT):
     ...
-    return summary, df_full, df_adj, validation_df
+    # construir tablas CAT
     df_full, df_adj = build_cat_tables(inv_df, updates)
+
     new_total = float(df_full["NEW WEIGHT kgs"].sum())
     in_after = (low <= new_total <= high)
 
@@ -477,7 +478,7 @@ def run_analysis(uploaded, tol=TOL_DEFAULT):
 
     validation_df = build_validation(inv_df, gr_map, updates)
 
+    # UN SOLO RETURN, AL FINAL
     return summary, df_full, df_adj, validation_df
-
 
 
