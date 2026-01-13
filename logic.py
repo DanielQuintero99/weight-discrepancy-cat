@@ -8,10 +8,6 @@ Original file is located at
 """
 
 
-print("Archivos cargados:")
-for k in uploaded.keys():
-    print("-", k)
-
 import re, io
 import pandas as pd
 import pdfplumber
