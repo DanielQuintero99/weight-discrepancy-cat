@@ -44,4 +44,19 @@ if st.button("🔍 Ejecutar análisis"):
             except Exception as e:
                 st.error("Ocurrió un error durante el análisis")
                 st.exception(e)
+st.subheader("📊 Totales del shipment")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric(
+        label="📦 Total Invoice (kg)",
+        value=round(summary["Invoice total (kg)"].iloc[0], 2)
+    )
+
+with col2:
+    st.metric(
+        label="🏭 Total GR (kg)",
+        value=round(summary["GR total (kg)"].iloc[0], 2)
+    )
 
